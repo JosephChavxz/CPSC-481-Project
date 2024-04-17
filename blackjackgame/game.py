@@ -11,7 +11,28 @@ from blackjackgame.player import *
 from blackjackgame.cards import  *
 from random import choice
 import sys
+import json
 
+
+def load_ai_data():
+    try:
+        with open('ai_data.json', 'r') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return {"hands": {}}
+
+def save_ai_data(ai_data):
+    with open('ai_data.json', 'w') as file:
+        json.dump(ai_data, file, indent=4)
+
+def ai_decision(hand, ai_data):
+    hand_key = " ".join(sorted([str(card) for card in hand]))  # Ensure the hand is properly represented
+    stats = ai_data["hands"].get(hand_key, {"win": 0, "lose": 0})
+    if stats["win"] / (stats["win"] + stats["lose"] + 1) > 0.5:
+        return "stand"
+    else:
+        return "hit"
+    
 
 class BlackJackGame:
     """the blackjack gm"""
