@@ -1,134 +1,55 @@
-	#! /usr/bin/env python3
-# Matthew Jun
-# Matt.j@csu.fullerton.edu
-# @mwjun
-
-import pickle
-from locale import currency, setlocale, LC_ALL
-
-
 class Player:
-	"""player class that has both human and ai"""
+    """Player class that handles both human and AI players."""
 
-	def __init__(self, name, bankroll = 10000):
-		"""update te bank balance of the player"""
-		self._pname = name
-		self._pbalance = bankroll
-		self._bet = 0
-		self._wager = 0
-		self._betlist = []
-		self._bust = False
-		self._stay = False
-		setlocale(LC_ALL, '')
+    def __init__(self, name, bankroll=10000, is_ai=False):
+        self.name = name
+        self.bankroll = bankroll
+        self.is_ai = is_ai
+        self.hand = []
+        self.is_staying = False  # Boolean to track if player is staying
+        self.is_busted = False   # Boolean to track if player has busted
 
-	#def _hit(self):
-		
-	@property
-	def name(self):
-		"""return player's name"""
-		return self._pname
-	
-	def __str__(self):
-		"""covert the player to a printale string"""
-		return f"{self._pname} and remaining balance is {self._pbalance}"
-	
-	def __repr__(self):
-		"""python reprsentation, represent!"""
-		return f'Player(name = {self._pname}, pbalance = {self._pbalance}'
-	
-	@property
-	def wager(self):
-		"""how much player is waging"""
-		return self._wager
-	
-	@wager.setter
-	def wager(self,amount):
-		"""how muh a player is betting"""
-		if amount > self._pbalance:
-			raise ValueError("You dont have enough money fool")
-		self._wager = amount
-		self._pbalance -= amount
+    def add_card(self, card):
+        """Adds a card to the player's hand."""
+        self.hand.append(card)
+        self.check_bust()
 
-	def get_bet(self):
-		return self._betlist
+    def hand_value(self):
+        """Calculates the hand value, taking into account the ace as 11 or 1."""
+        value, aces = 0, 0
+        for card in self.hand:
+            if card.rank == 'Ace':
+                value += 11
+                aces += 1
+            elif card.rank in ['Jack', 'Queen', 'King']:
+                value += 10
+            else:
+                value += int(card.rank)
+        while value > 21 and aces:
+            value -= 10
+            aces -= 1
+        return value
 
-	def deposit(self, amount):
-		"""Deposit cash into the player's wallet"""
-		self._pbalance += amount
+    def check_bust(self):
+        """Check if the player has busted and update the is_busted status."""
+        if self.hand_value() > 21:
+            self.is_busted = True
 
-	def withdraw(self, amount):
-		"""take away frm the player's wallet"""
-		if amount > self._pbalance:
-			print("You dont have enough money fool, go home!")
-			exit
-		self._pbalance -= amount
+    def stay(self):
+        """Player decides to stay."""
+        self.is_staying = True
 
-	def track_bet(self,amount):
-		return self._wager == amount
-	
-	def get_bet(self):
-		return self._wager
+    def display_hand(self):
+        """Returns a formatted string of the player's hand."""
+        return ', '.join([str(card) for card in self.hand])
 
-	def player_stay(self):
-		self._stay = True
-		print("You chose to stay")
-		return self._stay
 
-	def busted(self):
-		self._bust = True
-		print(f'{self._pname} busted!')
-		return self._bust
+    def bust(self):
+        """Sets the player's bust status."""
+        self.is_busted = True
 
-	def get_bal(self):
-		return self._pbalance
 
-	def dont_have_enough_msg(self):
-		print("You don't have enough balance.")
-
-	def deduction_message(self, amount):
-		print(f"{self._pname}, you hve deducted {amount} from your balance.")
-
-	def remaining_bal(self):
-		print(f"{self._pname}, you now have {self._pbalance} left in your balance.\n")
-	
-	def is_dealer(self):
-		"""Keep track if its player or bot"""
-		return False
-	
-	def dealer_loss(self):
-		return False
-	
-	def double_down(self):
-		double_wager = self._wager *2
-		return double_wager
-
-	def deposit_winning(self,amount):
-		winning = amount *2
-		self._pbalance += winning
-
-def to_file(pickle_file, players):
-	"""Write players onto a file and store them, otherwise known as a pickled file"""
-	#with automatically closes the file after everything is open
-	#open opens a file called pickle_file and makes it in write mode, then assigns it to file_handle
-	#file_handle is a variable
-	with open(pickle_file, 'wb') as file_handle:
-		pickle.dump(players,file_handle, pickle.HIGHEST_PROTOCOL)
-
-def from_file(pickle_file):
-	"""This unpacks the pickle file and loads the contents"""
-	with open(pickle_file, 'rb') as file_handle:
-		players = pickle.load(file_handle)
-	return players
-
-class Dealer(Player):
-	"""The AI player"""
-		
-	def __init__(self, pname = "dealer", amount = 0):
-		super().__init__(pname, amount)
-
-	def is_dealer(self):
-		return True
-			
-
-	
-	
+    def __str__(self):
+        """Returns a string representation of the player."""
+        hand_description = self.display_hand() if self.hand else "No cards"
+        return f"{self.name} has a balance of {currency(self.bankroll)} and holds: {hand_description}"

@@ -42,12 +42,11 @@ class Deck:
     suits = "♣️ ♥️ ♠️ ♦️".split()
     values = list(range(1, 11)) + [10, 10, 10]
     value_dict = dict(zip(ranks, values))
-    numbers = []
 
     def __init__(self):
         """Create one whole deck of cards. The cards are not in new deck order."""
         self._cards = [Card(rank, suit) for suit in self.suits for rank in self.ranks]
-        self._cursor = 0
+        shuffle(self._cards)  # Shuffle the deck immediately upon creation
 
     def __len__(self):
         """Return the number of cards in the deck."""
@@ -66,7 +65,7 @@ class Deck:
         """Return the next card in the deck."""
         if self._cursor < len(self._cards):
             pos = self._cursor
-            self._cursor = self._cursor + 1
+            self._cursor += 1
             return self._cards[pos]
         else:
             self._cursor = 0
@@ -78,7 +77,7 @@ class Deck:
             shuffle(self._cards)
 
     def cut(self):
-        """Cut the deck at approximately the half way point +/- 10 cards."""
+        """Cut the deck at approximately the halfway point +/- 10 cards."""
         extra = ceil(len(self._cards) * 0.2)
         half = (len(self._cards) // 2) + randrange(-extra, extra)
         tophalf = self._cards[:half]
@@ -89,6 +88,13 @@ class Deck:
         """Deal n cards. Default is 1 card."""
         return [self._cards.pop() for x in range(n)]
 
+    def draw_card(self):
+        """Draw a single card from the top of the deck."""
+        if self._cards:
+            return self._cards.pop()
+        else:
+            raise IndexError("The deck is empty")
+
     def merge(self, deck):
         """Merge the current deck with the deck passed as a parameter."""
         self._cards = self._cards + deck._cards
@@ -96,10 +102,6 @@ class Deck:
     def __str__(self):
         """Convert the deck to a string."""
         return ", ".join(map(str, self._cards))
-
-    # def player_card_val(self, val):
-    #     """keep track of player's hand"""
-    #     self.numbers.append(val)
 
 def card_value(c):
     """Return the numerical value of the rank of a given card."""
