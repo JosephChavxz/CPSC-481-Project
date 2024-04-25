@@ -25,6 +25,7 @@ class BlackJackGame:
     def __init__(self):
         self.deck = Deck()
         self.players = []
+        self.dealer = [Dealer()]
         self.setup_game()
 
     def setup_game(self):
@@ -85,7 +86,7 @@ class BlackJackGame:
 
     def check_winners(self):
         for player in self.players:
-            if player.is_bust():
+            if player.is_busted:
                 print(f"{player.name} loses by bust.")
             else:
                 self.compare_scores(player)

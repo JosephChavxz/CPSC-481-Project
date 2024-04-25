@@ -48,8 +48,30 @@ class Player:
         """Sets the player's bust status."""
         self.is_busted = True
 
+    def has_busted(self):
+        """Returns True if the player has busted."""
+        return self.is_busted
+    
+    def is_dealer(self):
+        """Keep track if its a player or bot"""
+        return False
+    
+    def dealer_loss(self):
+        return False
 
     def __str__(self):
         """Returns a string representation of the player."""
         hand_description = self.display_hand() if self.hand else "No cards"
         return f"{self.name} has a balance of {currency(self.bankroll)} and holds: {hand_description}"
+    
+
+
+class Dealer(Player):
+    """Dealer class that inherits from Player class."""
+    def __init__(self):
+        super().__init__("Dealer", bankroll=0)
+
+    def is_dealer(self):
+        """Keep track if its a player or dealer"""
+        return True
+    
