@@ -1,13 +1,15 @@
 class Player:
     """Player class that handles both human and AI players."""
 
-    def __init__(self, name, bankroll=10000, is_ai=False):
+    def __init__(self, name, bankroll=10000, is_ai=False, is_dealer=False):
         self.name = name
         self.bankroll = bankroll
         self.is_ai = is_ai
+        self.is_dealer = is_dealer
         self.hand = []
         self.is_staying = False  # Boolean to track if player is staying
         self.is_busted = False   # Boolean to track if player has busted
+        self.is_dealer = False   # Boolean to track if player is the dealer
 
     def add_card(self, card):
         """Adds a card to the player's hand."""
@@ -51,5 +53,27 @@ class Player:
 
     def __str__(self):
         """Returns a string representation of the player."""
-        hand_description = self.display_hand() if self.hand else "No cards"
-        return f"{self.name} has a balance of {currency(self.bankroll)} and holds: {hand_description}"
+        # hand_description = self.display_hand() if self.hand else "No cards"
+        # return f"{self.name} has a balance of {currency(self.bankroll)} and holds: {hand_description}"
+
+
+class Dealer(Player):
+    """The AI player"""
+
+    def __init__(self, pname="dealer", amount=0, is_dealer=True):
+        super().__init__(pname, amount, is_dealer)
+        self.is_dealer = True
+     
+    def is_dealer(self):
+        return True
+
+class AiPlayer(Player):
+    """The AI player"""
+
+    def __init__(self, pname = "AI", amount = 0, is_ai=True):
+        super().__init__(pname, amount, is_ai)
+        self.is_ai = True
+
+    def is_ai(self):
+        return True
+    

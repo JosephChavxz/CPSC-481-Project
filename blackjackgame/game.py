@@ -36,7 +36,8 @@ class BlackJackGame:
             self.players.append(Player(name))
         for j in range(num_ai):
             ai_name = f"AI_Player_{j + 1}"
-            self.players.append(Player(ai_name, is_ai=True))
+            self.players.append(AiPlayer(ai_name, is_ai=True))
+        self.players.append(Dealer("Dealer", is_dealer=True))
         self.deck.shuffle()
         self.initial_deal()
 
@@ -53,7 +54,13 @@ class BlackJackGame:
 
     def player_options(self):
         for player in self.players:
-            if player.is_ai:
+            if player.is_dealer:
+                print("finally")
+                if player.hand_value() < 17:
+                    player.add_card(self.deck.draw_card())
+                    print(f"{player.name}'s final hand: {player.display_hand()} with a total of {player.hand_value()}")
+            elif player.is_ai:
+                print('oops')
                 self.ai_plays(player)
             else:
                 self.human_plays(player)
@@ -85,13 +92,13 @@ class BlackJackGame:
 
     def check_winners(self):
         for player in self.players:
-            if player.is_bust():
+            if player.is_busted:
                 print(f"{player.name} loses by bust.")
             else:
                 self.compare_scores(player)
 
     def compare_scores(self, player):
-        dealer = next(p for p in self.players if p.is_dealer())
+        dealer = next(p for p in self.players if p.is_dealer)
         dealer_score = dealer.hand_value()
         player_score = player.hand_value()
         if player_score > dealer_score or dealer_score > 21:
@@ -104,10 +111,6 @@ class BlackJackGame:
     def play(self):
         self.player_options()
         self.check_winners()
-
-if __name__ == "__main__":
-    game = BlackJackGame()
-    game.play()
 
 
 
