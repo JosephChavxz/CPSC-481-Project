@@ -61,7 +61,7 @@ class BlackJackGame:
             choice = input("Would you like to 'hit' or 'stand'? ").lower()
             if choice == 'hit':
                 player.add_card(self.deck.draw_card())
-                print(f"{player.name} now has {player.display_hand()}")
+                print(f"{player.name} now has {player.display_hand()} and a value of: {player.hand_value()}")
                 if player.is_busted:
                     print(f"{player.name} has gone over 21!")
                     break
