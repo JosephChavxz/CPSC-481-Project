@@ -104,7 +104,7 @@ class BlackJackGame:
 
         # Write all players' history to a JSON file
         with open('history.json', 'w') as f:
-            json.dump(existing_data, f)
+            json.dump(existing_data, f, indent=4)
             
     def compare_scores(self, player):
         if player.is_dealer:
