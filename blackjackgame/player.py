@@ -55,7 +55,7 @@ class Player:
 
     def history_to_json(self):
         return {
-            'history': [(hand_value, action) if isinstance(hand_value, int) else hand_value for hand_value, action in self.history],
+            'history': [(hand_value, action) if isinstance(hand_value, int) else hand_value for hand_value, action in self.player_history],
             'outcome': self.outcome  # 'win', 'loss', or 'tie'
         }    
     
@@ -101,18 +101,12 @@ class AiPlayer(Player):
 
     def decide_move(self):
         current_hand_value = self.hand_value()
-        print(self.player_history)
-
-        # first_game_history = self.history[0]['history']
-
-        # Print the history of all games
-        print(len(self.history))
         
-        # history = [move[1] for game in self.history for move in game['history'] if move[0] == current_hand_value]
-        # if not history:
-        #     return random.choice(['h', 's'])
+        history = [move[1] for game in self.history for move in game['history'] if move[0] == current_hand_value]
+        if not history:
+            return random.choice(['h', 's'])
         
-        # return max(set(history), key=history.count)
+        return max(set(history), key=history.count)
 
     def is_ai(self):
         return True

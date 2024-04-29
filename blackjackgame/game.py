@@ -10,17 +10,6 @@ from blackjackgame.cards import *
 import sys
 import json
 
-def load_ai_data():
-    try:
-        with open('ai_data.json', 'r') as file:
-            return json.load(file)
-    except FileNotFoundError:
-        return {"hands": {}}
-
-def save_ai_data(ai_data):
-    with open('ai_data.json', 'w') as file:
-        json.dump(ai_data, file, indent=4)
-
 class BlackJackGame:
     def __init__(self):
         self.deck = Deck()
@@ -82,15 +71,16 @@ class BlackJackGame:
 
 
     def ai_plays(self, player):
-        move = player.decide_move()
-        while move == 'h':
-            player.add_card(self.deck.draw_card())
-            if player.hand_value() > 21:
-                player.bust()
-                print(f"{player.name} has busted!")
-                return
+        while not player.is_busted and not player.is_staying:
             move = player.decide_move()
-        player.stay()
+            while move == 'h':
+                player.add_card(self.deck.draw_card())
+                if player.hand_value() > 21:
+                    player.bust()
+                    print(f"{player.name} has busted!")
+                    return
+                move = player.decide_move()
+            player.stay()
         print(f"{player.name}'s final hand: {player.display_hand()} with a total of {player.hand_value()}")
     
     def check_winners(self):
@@ -107,10 +97,10 @@ class BlackJackGame:
         except FileNotFoundError:
             existing_data = []
 
-                # Append new data
+        # Append new data
         existing_data.extend(self.all_players_history)
 
-                # Write all players' history to a JSON file
+        # Write all players' history to a JSON file
         with open('history.json', 'w') as f:
             json.dump(existing_data, f)
             
@@ -129,6 +119,7 @@ class BlackJackGame:
         else:
             print(f"{player.name} ties with the dealer.")
             player.outcome = 'tie'
+            
         self.all_players_history.append(player.history_to_json())
 
     def play(self):
