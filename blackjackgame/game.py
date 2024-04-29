@@ -26,6 +26,7 @@ class BlackJackGame:
         self.deck = Deck()
         self.players = []
         self.setup_game()
+        self.all_players_history = []
 
     def setup_game(self):
         print('Welcome to Blackjack!')
@@ -81,15 +82,17 @@ class BlackJackGame:
 
 
     def ai_plays(self, player):
-        while player.hand_value() < 17:
+        move = player.decide_move()
+        while move == 'h':
             player.add_card(self.deck.draw_card())
-        if player.hand_value() > 21:
-            player.bust()
-            print(f"{player.name} has busted!")
-        else:
-            player.stay()
+            if player.hand_value() > 21:
+                player.bust()
+                print(f"{player.name} has busted!")
+                return
+            move = player.decide_move()
+        player.stay()
         print(f"{player.name}'s final hand: {player.display_hand()} with a total of {player.hand_value()}")
-
+    
     def check_winners(self):
         for player in self.players:
             if player.is_busted:
@@ -97,16 +100,36 @@ class BlackJackGame:
             else:
                 self.compare_scores(player)
 
+        # Load existing data
+        try:
+            with open('history.json', 'r') as f:
+                existing_data = json.load(f)
+        except FileNotFoundError:
+            existing_data = []
+
+                # Append new data
+        existing_data.extend(self.all_players_history)
+
+                # Write all players' history to a JSON file
+        with open('history.json', 'w') as f:
+            json.dump(existing_data, f)
+            
     def compare_scores(self, player):
+        if player.is_dealer:
+            return
         dealer = next(p for p in self.players if p.is_dealer)
         dealer_score = dealer.hand_value()
         player_score = player.hand_value()
         if player_score > dealer_score or dealer_score > 21:
             print(f"{player.name} wins!")
+            player.outcome = 'win'
         elif player_score < dealer_score:
-            print(f"{player.name} loses.")
+            print(f"{player.name} loses, dealer has {dealer_score}, closer to 21 as the player has {player_score}.")
+            player.outcome = 'loss'
         else:
             print(f"{player.name} ties with the dealer.")
+            player.outcome = 'tie'
+        self.all_players_history.append(player.history_to_json())
 
     def play(self):
         self.player_options()

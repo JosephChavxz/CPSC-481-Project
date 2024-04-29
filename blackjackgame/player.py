@@ -1,3 +1,6 @@
+import json
+import random
+
 class Player:
     """Player class that handles both human and AI players."""
 
@@ -10,11 +13,14 @@ class Player:
         self.is_staying = False  # Boolean to track if player is staying
         self.is_busted = False   # Boolean to track if player has busted
         self.is_dealer = False   # Boolean to track if player is the dealer
+        self.history = []        # List to store the player's hand history
 
     def add_card(self, card):
         """Adds a card to the player's hand."""
         self.hand.append(card)
         self.check_bust()
+        if self.is_ai == False:
+            self.history.append((self.hand_value(), 'h'))
 
     def hand_value(self):
         """Calculates the hand value, taking into account the ace as 11 or 1."""
@@ -40,7 +46,18 @@ class Player:
     def stay(self):
         """Player decides to stay."""
         self.is_staying = True
+        if self.is_ai == False:
+            self.history.append((self.hand_value(), 's'))
 
+    def result(self, result):
+        self.history.append(result)
+
+    def history_to_json(self):
+        return {
+            'history': [(hand_value, action) if isinstance(hand_value, int) else hand_value for hand_value, action in self.history],
+            'outcome': self.outcome  # 'win', 'loss', or 'tie'
+        }    
+    
     def display_hand(self):
         """Returns a formatted string of the player's hand."""
         return ', '.join([str(card) for card in self.hand])
@@ -73,6 +90,28 @@ class AiPlayer(Player):
     def __init__(self, pname = "AI", amount = 0, is_ai=True):
         super().__init__(pname, amount, is_ai)
         self.is_ai = True
+        self.load_history()
+        # with open('history.json', 'r') as f:
+        #     json.dump(self.history, f)
+
+    def load_history(self):
+        with open('history.json', 'r') as f:
+            self.history = json.load(f)
+
+    def decide_move(self):
+        current_hand_value = self.hand_value()
+        # print(self.history)
+
+        # first_game_history = self.history[0]['history']
+
+        # Print the history of all games
+        print(len(self.history))
+        
+        history = [move[1] for game in self.history for move in game['history'] if move[0] == current_hand_value]
+        if not history:
+            return random.choice(['h', 's'])
+        
+        return max(set(history), key=history.count)
 
     def is_ai(self):
         return True
