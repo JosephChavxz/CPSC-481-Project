@@ -15,6 +15,7 @@ class Player:
         self.is_dealer = False   # Boolean to track if player is the dealer
         self.player_history = [] # List to store the player's hand history
         self.history = []        # List to store the player's hand history
+        self.done = False
 
     def add_card(self, card):
         """Adds a card to the player's hand."""
@@ -81,6 +82,7 @@ class Dealer(Player):
     def __init__(self, pname="dealer", amount=0, is_dealer=True):
         super().__init__(pname, amount, is_dealer)
         self.is_dealer = True
+        self.is_ai = False
      
     def is_dealer(self):
         return True
@@ -92,8 +94,7 @@ class AiPlayer(Player):
         super().__init__(pname, amount, is_ai)
         self.is_ai = True
         self.load_history()
-        # with open('history.json', 'r') as f:
-        #     json.dump(self.history, f)
+        self.is_dealer = False
 
     def load_history(self):
         with open('history.json', 'r') as f:
@@ -101,11 +102,15 @@ class AiPlayer(Player):
 
     def decide_move(self):
         current_hand_value = self.hand_value()
-        
-        history = [move[1] for game in self.history for move in game['history'] if move[0] == current_hand_value]
+        history = [move[1] for game in self.history if game['outcome'] == "win" for move in game['history'] if move[0] == current_hand_value]
         if not history:
-            return random.choice(['h', 's'])
-        
+            history = [move[1] for game in self.history for move in game['history'] if move[0] == current_hand_value]
+            print("Not in history")
+            print(history)
+            if not history:
+                return random.choice(['h', 's'])
+        print("In history")
+        print(history)
         return max(set(history), key=history.count)
 
     def is_ai(self):

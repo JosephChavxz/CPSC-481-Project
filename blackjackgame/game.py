@@ -63,7 +63,7 @@ class BlackJackGame:
                 player.add_card(self.deck.draw_card())
                 print(f"{player.name} now has {player.display_hand()}")
                 if player.is_busted:
-                    print(f"{player.name} has busted!")
+                    print(f"{player.name} has gone over 21!")
                     break
             elif choice == 'stand':
                 player.stay()
@@ -75,9 +75,10 @@ class BlackJackGame:
             move = player.decide_move()
             while move == 'h':
                 player.add_card(self.deck.draw_card())
+                print(f"{player.name}, hit, so now it has a value of {player.hand_value()}")
                 if player.hand_value() > 21:
                     player.bust()
-                    print(f"{player.name} has busted!")
+                    print(f"{player.name} has gone over 21!")
                     return
                 move = player.decide_move()
             player.stay()
@@ -87,8 +88,9 @@ class BlackJackGame:
         for player in self.players:
             if player.is_busted:
                 print(f"{player.name} loses by bust.")
-            else:
-                self.compare_scores(player)
+                player.outcome = 'loss'
+                # self.compare_scores(player)
+            self.compare_scores(player)
 
         # Load existing data
         try:
@@ -110,17 +112,32 @@ class BlackJackGame:
         dealer = next(p for p in self.players if p.is_dealer)
         dealer_score = dealer.hand_value()
         player_score = player.hand_value()
-        if player_score > dealer_score or dealer_score > 21:
-            print(f"{player.name} wins!")
-            player.outcome = 'win'
-        elif player_score < dealer_score:
-            print(f"{player.name} loses, dealer has {dealer_score}, closer to 21 as the player has {player_score}.")
-            player.outcome = 'loss'
-        else:
+
+        if (player_score == dealer_score and player_score <= 21):
             print(f"{player.name} ties with the dealer.")
             player.outcome = 'tie'
-            
-        self.all_players_history.append(player.history_to_json())
+            self.all_players_history.append(player.history_to_json())
+
+        elif player_score < dealer_score and dealer_score <= 21:
+            print(f"{player.name} loses, dealer has {dealer_score}, closer to 21 as the player has {player_score}.")
+            player.outcome = 'loss'
+            self.all_players_history.append(player.history_to_json())
+
+        elif not player.is_busted and (player_score <= 21 or player_score > dealer_score or dealer_score > 21):
+            print(f"{player.name} wins!")
+            player.outcome = 'win'
+            self.all_players_history.append(player.history_to_json())
+
+        elif player.is_busted:
+            print(f"{player.name} loses by bust.")
+            player.outcome = 'loss'
+            self.all_players_history.append(player.history_to_json())
+
+        print(player.player_history)
+        print(player.outcome)
+        test = player.history_to_json()
+        print(test)
+        # self.all_players_history.append(player.history_to_json())
 
     def play(self):
         self.player_options()
