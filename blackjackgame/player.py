@@ -13,14 +13,15 @@ class Player:
         self.is_staying = False  # Boolean to track if player is staying
         self.is_busted = False   # Boolean to track if player has busted
         self.is_dealer = False   # Boolean to track if player is the dealer
+        self.player_history = [] # List to store the player's hand history
         self.history = []        # List to store the player's hand history
 
     def add_card(self, card):
         """Adds a card to the player's hand."""
         self.hand.append(card)
         self.check_bust()
-        if self.is_ai == False:
-            self.history.append((self.hand_value(), 'h'))
+        if self.is_dealer == False:
+            self.player_history.append((self.hand_value(), 'h'))
 
     def hand_value(self):
         """Calculates the hand value, taking into account the ace as 11 or 1."""
@@ -46,8 +47,8 @@ class Player:
     def stay(self):
         """Player decides to stay."""
         self.is_staying = True
-        if self.is_ai == False:
-            self.history.append((self.hand_value(), 's'))
+        if self.is_dealer == False:
+            self.player_history.append((self.hand_value(), 's'))
 
     def result(self, result):
         self.history.append(result)
@@ -100,18 +101,18 @@ class AiPlayer(Player):
 
     def decide_move(self):
         current_hand_value = self.hand_value()
-        # print(self.history)
+        print(self.player_history)
 
         # first_game_history = self.history[0]['history']
 
         # Print the history of all games
         print(len(self.history))
         
-        history = [move[1] for game in self.history for move in game['history'] if move[0] == current_hand_value]
-        if not history:
-            return random.choice(['h', 's'])
+        # history = [move[1] for game in self.history for move in game['history'] if move[0] == current_hand_value]
+        # if not history:
+        #     return random.choice(['h', 's'])
         
-        return max(set(history), key=history.count)
+        # return max(set(history), key=history.count)
 
     def is_ai(self):
         return True
