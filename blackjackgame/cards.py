@@ -2,6 +2,15 @@
 # Matthew Jun
 # Matt.j@csu.fullerton.edu
 # @mwjun
+
+# Leoanrdo Medrano
+# lm1014367@csu.fullerton.edu
+# @FenTheDeer
+
+# Joseph Chavez
+# jchavez0026@csu.fullerton.edu
+# @JosephChavxz
+
 """A French suited playing card class and a Deck of 52 cards class"""
 
 from collections import namedtuple

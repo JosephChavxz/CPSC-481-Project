@@ -1,12 +1,24 @@
+#! /usr/bin/env python3
+# Matthew Jun
+# Matt.j@csu.fullerton.edu
+# @mwjun
+
+# Leoanrdo Medrano
+# lm1014367@csu.fullerton.edu
+# @FenTheDeer
+
+# Joseph Chavez
+# jchavez0026@csu.fullerton.edu
+# @JosephChavxz
+
 import json
 import random
 
 class Player:
     """Player class that handles both human and AI players."""
 
-    def __init__(self, name, bankroll=10000, is_ai=False, is_dealer=False):
+    def __init__(self, name, is_ai=False, is_dealer=False):
         self.name = name
-        self.bankroll = bankroll
         self.is_ai = is_ai
         self.is_dealer = is_dealer
         self.hand = []
@@ -55,6 +67,7 @@ class Player:
         self.history.append(result)
 
     def history_to_json(self):
+        """Converts the player's history to a json object."""
         return {
             'history': [(hand_value, action) if isinstance(hand_value, int) else hand_value for hand_value, action in self.player_history],
             'outcome': self.outcome  # 'win', 'loss', or 'tie'
@@ -96,21 +109,23 @@ class AiPlayer(Player):
         self.load_history()
         self.is_dealer = False
 
+    # Loads history.json file to make decisions
     def load_history(self):
         with open('history.json', 'r') as f:
             self.history = json.load(f)
 
     def decide_move(self):
+        """Decide the move based on the any player's history."""
         current_hand_value = self.hand_value()
+        # Get the most common move for the current hand value for each game where the player won
         history = [move[1] for game in self.history if game['outcome'] == "win" for move in game['history'] if move[0] == current_hand_value]
         if not history:
+            # If the player has never been in a situation where it wins with a current hand value, 
+            # get the most common move for the current hand value for each game
             history = [move[1] for game in self.history for move in game['history'] if move[0] == current_hand_value]
-            print("Not in history")
-            print(history)
+            #If for any reason such entry doesn't exist, it will return a random choice
             if not history:
                 return random.choice(['h', 's'])
-        print("In history")
-        print(history)
         return max(set(history), key=history.count)
 
     def is_ai(self):
