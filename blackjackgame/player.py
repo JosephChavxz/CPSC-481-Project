@@ -111,7 +111,7 @@ class AiPlayer(Player):
 
     # Loads history.json file to make decisions
     def load_history(self):
-        with open('history.json', 'r') as f:
+        with open('history/history.json', 'r') as f:
             self.history = json.load(f)
 
     def decide_move(self):

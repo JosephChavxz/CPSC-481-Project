@@ -119,13 +119,13 @@ class BlackJackGame:
 
         # Load existing data
         try:
-            with open('history.json', 'r') as f:
+            with open('history/history.json', 'r') as f:
                 existing_data = json.load(f)
         except FileNotFoundError:
             existing_data = []
 
         try:
-            with open('ai_history.json', 'r') as f:
+            with open('history/ai_history.json', 'r') as f:
                 existing_ai_data = json.load(f)
         except FileNotFoundError:
             existing_ai_data = []
@@ -135,11 +135,11 @@ class BlackJackGame:
         existing_ai_data.extend(self.ai_players_history)
 
         # Write ai players' history to a JSON file
-        with open('ai_history.json', 'w') as f:
+        with open('history/ai_history.json', 'w') as f:
             json.dump(existing_ai_data, f, indent=4)
 
         # Write real players' history to a JSON file
-        with open('history.json', 'w') as f:
+        with open('history/history.json', 'w') as f:
             json.dump(existing_data, f, indent=4) # Indent for easier reading, otherwise it'll all be one line.
             
     def compare_scores(self, player):
