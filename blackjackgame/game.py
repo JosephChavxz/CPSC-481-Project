@@ -23,6 +23,7 @@ class BlackJackGame:
         self.players = []
         self.setup_game()
         self.all_players_history = []
+        self.ai_players_history = []
 
     def setup_game(self):
         """Helps set up game by asking how many human and AI players are playing."""
@@ -123,10 +124,21 @@ class BlackJackGame:
         except FileNotFoundError:
             existing_data = []
 
+        try:
+            with open('ai_history.json', 'r') as f:
+                existing_ai_data = json.load(f)
+        except FileNotFoundError:
+            existing_ai_data = []
+
         # Append new data
         existing_data.extend(self.all_players_history)
+        existing_ai_data.extend(self.ai_players_history)
 
-        # Write all players' history to a JSON file
+        # Write ai players' history to a JSON file
+        with open('ai_history.json', 'w') as f:
+            json.dump(existing_ai_data, f, indent=4)
+
+        # Write real players' history to a JSON file
         with open('history.json', 'w') as f:
             json.dump(existing_data, f, indent=4) # Indent for easier reading, otherwise it'll all be one line.
             
@@ -143,25 +155,37 @@ class BlackJackGame:
         if (player_score == dealer_score and player_score <= 21):
             print(f"{player.name} ties with the dealer.")
             player.outcome = 'tie'
-            self.all_players_history.append(player.history_to_json())
+            if player.is_ai:
+                self.ai_players_history.append(player.history_to_json())
+            else:
+                self.all_players_history.append(player.history_to_json())
 
         # If the player has a lower score than the dealer, the player losses.
         elif player_score < dealer_score and dealer_score <= 21:
             print(f"{player.name} loses, dealer has {dealer_score}, closer to 21 as the player has {player_score}.")
             player.outcome = 'loss'
-            self.all_players_history.append(player.history_to_json())
+            if player.is_ai:
+                self.ai_players_history.append(player.history_to_json())
+            else:
+                self.all_players_history.append(player.history_to_json())
 
         # If the player has a higher score than the dealer, the player wins as long as the player is not busted.
         elif not player.is_busted and (player_score <= 21 or player_score > dealer_score or dealer_score > 21):
             print(f"{player.name} wins!")
             player.outcome = 'win'
-            self.all_players_history.append(player.history_to_json())
+            if player.is_ai:
+                self.ai_players_history.append(player.history_to_json())
+            else:
+                self.all_players_history.append(player.history_to_json())
 
         # Self explanatory, if the player is busted, the player loses.
         elif player.is_busted:
             print(f"{player.name} loses by bust.")
             player.outcome = 'loss'
-            self.all_players_history.append(player.history_to_json())
+            if player.is_ai:
+                self.ai_players_history.append(player.history_to_json())
+            else:
+                self.all_players_history.append(player.history_to_json())
 
         test = player.history_to_json()
         print(test)
