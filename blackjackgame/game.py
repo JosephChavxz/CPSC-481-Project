@@ -110,11 +110,8 @@ class BlackJackGame:
         print(f"{player.name}'s final hand: {player.display_hand()} with a total of {player.hand_value()}")
     
     def check_winners(self):
-        """Function that checks the outcome of the game."""
+        """Function that checks the outcome of the game, and saves the history of the game."""
         for player in self.players:
-            if player.is_busted:
-                print(f"{player.name} loses by bust.")
-                player.outcome = 'loss'
             self.compare_scores(player)
 
         # Load existing data
@@ -133,6 +130,14 @@ class BlackJackGame:
         # Append new data
         existing_data.extend(self.all_players_history)
         existing_ai_data.extend(self.ai_players_history)
+
+        # Prints the history of the game to be saved into the history.json or ai_history.json file
+        print("\nReal players' history to be saved: ")
+        for player in self.all_players_history:
+            print(player)
+        print("\nAI players' history to be saved: ")
+        for player in self.ai_players_history:
+            print(player)
 
         # Write ai players' history to a JSON file
         with open('history/ai_history.json', 'w') as f:
@@ -160,7 +165,7 @@ class BlackJackGame:
             else:
                 self.all_players_history.append(player.history_to_json())
 
-        # If the player has a lower score than the dealer, the player losses.
+        # If the player has a lower score than the dealer, the player loses.
         elif player_score < dealer_score and dealer_score <= 21:
             print(f"{player.name} loses, dealer has {dealer_score}, closer to 21 as the player has {player_score}.")
             player.outcome = 'loss'
@@ -187,8 +192,6 @@ class BlackJackGame:
             else:
                 self.all_players_history.append(player.history_to_json())
 
-        test = player.history_to_json()
-        print(test)
 
     def play(self):
         self.player_options()
